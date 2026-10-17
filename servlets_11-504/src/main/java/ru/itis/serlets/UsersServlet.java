@@ -1,12 +1,16 @@
 package ru.itis.serlets;
 
 import ru.itis.models.User;
+import ru.itis.repository.UsersRepository;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -14,35 +18,39 @@ import java.util.List;
 
 @WebServlet("/users")
 public class UsersServlet extends HttpServlet {
-    private List<User> users;
+//    private List<User> users;
+
+    private UsersRepository usersRepository;
 
     @Override
-    public void init() throws ServletException {
-        users = new ArrayList<>();
-        User userOne = User.builder()
-                .id(1L)
-                .name("Danil")
-                .surname("Smirnov")
-                .age(15)
-                .build();
+    public void init(ServletConfig config) throws ServletException {
+        usersRepository = (UsersRepository) config.getServletContext().getAttribute("usersRepository");
 
-        User userTwo = User.builder()
-                .id(1L)
-                .name("Said")
-                .surname("Garifov")
-                .age(19)
-                .build();
-
-        User userThree = User.builder()
-                .id(1L)
-                .name("Nikolay")
-                .surname("Kozlov")
-                .age(18)
-                .build();
-
-        users.add(userOne);
-        users.add(userTwo);
-        users.add(userThree);
+//        users = new ArrayList<>();
+//        User userOne = User.builder()
+//                .id(1L)
+//                .name("Danil")
+//                .surname("Smirnov")
+//                .age(15)
+//                .build();
+//
+//        User userTwo = User.builder()
+//                .id(1L)
+//                .name("Said")
+//                .surname("Garifov")
+//                .age(19)
+//                .build();
+//
+//        User userThree = User.builder()
+//                .id(1L)
+//                .name("Nikolay")
+//                .surname("Kozlov")
+//                .age(18)
+//                .build();
+//
+//        users.add(userOne);
+//        users.add(userTwo);
+//        users.add(userThree);
     }
 
     @Override
@@ -83,7 +91,11 @@ public class UsersServlet extends HttpServlet {
 //                "</html>");
 //
 //        writer.write(resultHtml.toString());
-        req.setAttribute("usersForJsp", users);
+        List list = usersRepository.findAll();
+        System.out.println(list.size());
+        req.setAttribute("usersForJsp", usersRepository.findAll());
+        HttpSession httpSession = req.getSession();
+        System.out.println(httpSession.getAttribute("authenticated"));
         req.getRequestDispatcher("/jsp/users.jsp").forward(req, resp);
     }
 
